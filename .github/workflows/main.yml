@@ -1,5 +1,5 @@
 .github/workflows/azure-terraform.yml
-name: Deploy Azure Infra via Terraform
+
 
 name: "Dev Terraform Workflow"
 
