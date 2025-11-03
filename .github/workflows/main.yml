@@ -1,42 +1,47 @@
 .github/workflows/azure-terraform.yml
 name: Deploy Azure Infra via Terraform
 
+name: "Dev Terraform Workflow"
+
 on:
-  push:
+  pull_request:
     branches:
       - main
-  workflow_dispatch:
+  push:
+    branches:
+      - main      
 
-jobs:
-  terraform:
-    runs-on: self-hosted  # Ye tera runner use karega
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
+permissions:
+  id-token: write
+  contents: read
+  
+jobs: 
+  terraform-init-plan:
+    runs-on: self-hosted
+    steps: 
+      - name: Checkout
+        uses: actions/checkout@v5.0.0
+    
+      - name: Azure Login
+        uses: Azure/login@v2.3.0
         with:
-          terraform_version: 1.9.7
-
+          client-id: ff27bcf6-f60c-4a57-8b01-8eee5de2a9cd
+          tenant-id: 0f7010fd-209e-4344-8457-043ffb37143b
+          subscription-id: 1075ec7a-b17a-4f37-bf3f-9d68c4506dc1
+            
+      - name: Terraform fmt
+        id: fmt
+        run: terraform fmt -check
+        continue-on-error: true
+        working-directory: environments/dev
+        
       - name: Terraform Init
-        run: terraform init
-        working-directory: ./environments/dev  # <-- yahan apna terraform folder ka path daal
+        id: init
+        run: terraform init -input=false  
+        working-directory: environments/dev
 
       - name: Terraform Validate
-        run: terraform validate
-        working-directory: ./environments/dev
-
-      - name: Terraform Plan
-        run: terraform plan
-        working-directory: ./environments/dev
-
-      - name: Terraform Apply
-        run: terraform apply -auto-approve
-        working-directory: ./environments/dev
-        env:
-          ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-          ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
-          ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+        id: validate
+        run: terraform validate -no-color
+        working-directory: environments/dev        
+      
