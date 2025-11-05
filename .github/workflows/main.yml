@@ -23,9 +23,9 @@ jobs:
       - name: Azure Login
         uses: azure/login@v2.3.0
         with:
-          client-id: 61eec298-e450-4a09-acb2-2755a57d4758
-          tenant-id: 4160b9b1-20ff-4971-be22-0b1c30d05d91
-          subscription-id: 8c512603-6b99-4d47-9d27-a573899ff4aa
+          client-id: 7470cd56-15b6-4002-ac42-f1c73c7b9db2
+          tenant-id: 7470cd56-15b6-4002-ac42-f1c73c7b9db2
+          subscription-id: f528f9c3-ba1f-462f-a320-9ea3c9a1df31
 
       - name: Terraform Format Check
         run: terraform fmt -check
