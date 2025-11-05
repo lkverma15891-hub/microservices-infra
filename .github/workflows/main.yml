@@ -1,45 +1,42 @@
 name: "Dev Terraform Workflow"
 
 on:
-  push:
-    branches:
-      - main
   pull_request:
     branches:
       - main
+  push:
+    branches:
+      - main      
 
 permissions:
   id-token: write
   contents: read
+  
 
-jobs:
+jobs: 
   terraform-init-plan:
     runs-on: self-hosted
-
-    steps:
+    steps: 
       - name: Checkout
-        uses: actions/checkout@v5.0.0
-
+        uses: actions/checkout@v5
+    
       - name: Azure Login
-        uses: azure/login@v2.3.0
+        uses: azure/login@v2
         with:
-          client-id: 7470cd56-15b6-4002-ac42-f1c73c7b9db2
-          tenant-id: 7470cd56-15b6-4002-ac42-f1c73c7b9db2
-          subscription-id: f528f9c3-ba1f-462f-a320-9ea3c9a1df31
-
-      - name: Terraform Format Check
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+            
+      - name: Terraform fmt
         run: terraform fmt -check
-        continue-on-error: true
         working-directory: environments/dev
-
+        
       - name: Terraform Init
-        run: terraform init -input=false
+        run: terraform init -input=false  
         working-directory: environments/dev
 
       - name: Terraform Validate
         run: terraform validate -no-color
-        working-directory: environments/dev
-
+        working-directory: environments/dev        
+      
       - name: Terraform Plan
-        run: terraform plan -input=false
+        run: terraform plan -input=false -no-color
         working-directory: environments/dev
